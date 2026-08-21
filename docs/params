@@ -1,0 +1,19 @@
+| Teacher model               | File size          | Approx. parameter elements |
+
+| ConvNeXt teacher            | `179,868 bytes`    | `43,828` params |
+| MobileNetV3 Small teacher   | `3,091,264 bytes`  | `1,523,096` params |
+| EfficientNetB0 teacher      | `8,071,972 bytes`  | `3,999,372` params |
+| ResNet50 teacher            | `23,928,320 bytes` | `23,501,984` params |
+
+student layers 
+
+Conv2D(10)
+DepthwiseConv2D + Conv2D(20)
+DepthwiseConv2D + Conv2D(30)
+DepthwiseConv2D + Conv2D(40)
+DepthwiseConv2D + Conv2D(50)
+GlobalAveragePooling
+Dropout(0.2)
+Dense(10)
+
+params: `5,930`

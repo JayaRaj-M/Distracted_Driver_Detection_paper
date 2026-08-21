@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Student Model Board Benchmark Report</title>
+<style>
+body { font-family: Calibri, Arial, sans-serif; font-size: 11pt; line-height: 1.35; }
+h1 { font-size: 22pt; color: #1f4e79; }
+h2 { font-size: 15pt; color: #1f4e79; margin-top: 22px; }
+table { border-collapse: collapse; width: 100%; margin: 10px 0 18px 0; }
+th, td { border: 1px solid #888; padding: 6px; vertical-align: top; }
+th { background: #d9eaf7; font-weight: bold; }
+.note { background: #fff2cc; border: 1px solid #d6b656; padding: 8px; }
+.small { font-size: 9.5pt; color: #555; }
+</style>
+</head>
+<body>
+<h1>Student Model Board Benchmark Report</h1>
+<p><b>Project:</b> Driver distraction TinyML deployment and board comparison<br>
+<b>Generated:</b> 2026-07-17 16:02<br>
+<b>Purpose:</b> Decide which Wokwi + PlatformIO boards are suitable for benchmarking the distilled student models before buying final hardware.</p>
+
+<h2>Short Recommendation</h2>
+<p>For the research-paper benchmark, use three tiers:</p>
+<ol>
+<li><b>ESP32 DevKit V1 real board</b>: proves the smallest student models run without PSRAM.</li>
+<li><b>ESP32-S3 DevKitC / Wokwi ESP32-S3</b>: simulator baseline and negative/positive memory experiments.</li>
+<li><b>M5Stack CoreS3 or ESP32-S3 N16R8 real board</b>: best final board because it has ESP32-S3 speed plus PSRAM for larger tensor arenas.</li>
+</ol>
+<p class="note"><b>Main finding:</b> model file size is not the only problem. The old 224 x 224 model was only about 180 KB, but it needed around 6.29 MB tensor arena in Wokwi, so PSRAM was required. The distilled students reduce this to 102-204 KB tensor arena, which can run on normal ESP32 internal SRAM.</p>
+
+<h2>Benchmarks Already Observed</h2>
+<table><thead><tr><th>Model / Test</th><th>Input</th><th>Model bytes</th><th>Tensor arena / memory</th><th>Board / Environment</th><th>Wokwi latency</th><th>Real / estimated latency</th><th>Prediction</th><th>Result note</th></tr></thead><tbody><tr><td>Original TFLite teacher/student export</td><td>224 x 224 x 3 INT8</td><td>179,868</td><td>6,291,456 bytes PSRAM arena</td><td>Wokwi ESP32-S3 with PSRAM</td><td>515,723 ms sim</td><td>~25,786.2 ms estimated real ESP32-S3</td><td>c5_operating_radio, 0.5212</td><td>Correct for img_99469, but too slow and requires PSRAM</td></tr><tr><td>Original model without PSRAM</td><td>224 x 224 x 3 INT8</td><td>179,868</td><td>Internal arena failed; requested 4,903,680 buffer</td><td>ESP32-S3 no PSRAM / wrong PSRAM setup</td><td>Failed</td><td>Failed</td><td>MODEL NOT RUNNING</td><td>Proved PSRAM is required for this large input/model path</td></tr><tr><td>Tiny baseline 96 gray</td><td>96 x 96 x 1 INT8</td><td>30,400</td><td>262,144 bytes</td><td>Wokwi ESP32-S3 / M5Stack CoreS3</td><td>31,000 ms sim</td><td>~1,550 ms estimated ESP32-S3</td><td>c3_texting_left, 0.1690</td><td>Runs in internal SRAM, but accuracy weak for c5 image</td></tr><tr><td>Fast tiny 64 gray</td><td>64 x 64 x 1 INT8</td><td>20,952</td><td>102,400 bytes</td><td>ESP32 DevKit V1 / Wokwi equivalent</td><td>~6,020 ms estimated Wokwi</td><td>301 ms measured ESP32 DevKit V1</td><td>c0_safe_driving, 0.2107</td><td>Fast enough, but wrong on tested distraction image</td></tr><tr><td>Student A distilled 96 gray</td><td>96 x 96 x 1 INT8</td><td>14,744</td><td>102,400 bytes</td><td>ESP32 DevKit V1 / Wokwi</td><td>1,377-1,378 ms sim</td><td>~68.8-68.9 ms estimated real ESP32</td><td>c8_hair_and_makeup, ~0.19-0.26</td><td>Very small and fast, but wrong for img_9992</td></tr><tr><td>Student B bigger 96 gray</td><td>96 x 96 x 1 INT8</td><td>27,184</td><td>204,800 bytes</td><td>Wokwi ESP32/ESP32-S3</td><td>51,929 ms sim</td><td>~2,596.4 ms estimated real ESP32</td><td>c6_drinking, 0.4832</td><td>More capacity but still wrong for img_9992 and much slower</td></tr><tr><td>Student C 96 RGB</td><td>96 x 96 x 3 INT8</td><td>26,768</td><td>204,800 bytes</td><td>Wokwi ESP32/ESP32-S3</td><td>79,771 ms sim</td><td>~3,988.6 ms estimated real ESP32</td><td>c2_talking_phone_right, 0.3745</td><td>Correct for img_9992; best accuracy direction, but slowest student</td></tr></tbody></table>
+
+<h2>Boards to Test: Wokwi + PlatformIO Suitability</h2>
+<table><thead><tr><th>Board</th><th>Wokwi availability</th><th>PlatformIO availability</th><th>Memory / clock notes</th><th>Recommendation</th></tr></thead><tbody><tr><td>ESP32 DevKit V1 / esp32doit-devkit-v1</td><td>Yes, ESP32 supported</td><td>Yes: esp32doit-devkit-v1</td><td>240 MHz, 4 MB flash, 320 KB listed RAM; no PSRAM on your board</td><td>Run 64 gray and 96 gray/RGB only if arena &lt;= largest internal block. Good real-board baseline.</td></tr><tr><td>ESP32-S3 DevKitC-1 / esp32-s3-devkitc-1</td><td>Yes, ESP32-S3 supported</td><td>Yes: esp32-s3-devkitc-1</td><td>240 MHz, 8 MB flash, 320 KB listed RAM; PlatformIO page says no PSRAM for N8 board</td><td>Good Wokwi simulator target. For the large 224 model, use a PSRAM variant or Wokwi PSRAM config.</td></tr><tr><td>M5Stack CoreS3 / m5stack-cores3</td><td>Yes, listed in Wokwi project templates</td><td>Yes: m5stack-cores3</td><td>ESP32-S3 240 MHz, 16 MB flash; M5Stack docs list 8 MB PSRAM</td><td>Best buy/test candidate if you want camera/display/PSRAM and closest to the PSRAM Wokwi result. In Wokwi it behaved like ESP32-S3 because same core.</td></tr><tr><td>RYMCU ESP32-S3 DevKitC N8R2</td><td>Likely simulate as ESP32-S3, not board-specific</td><td>Yes: rymcu-esp32-s3-devkitc-1</td><td>240 MHz, 8 MB flash, 2 MB PSRAM per PlatformIO CLI</td><td>Possible middle choice, but 2 MB PSRAM is not enough for the old 6.29 MB arena; should run students.</td></tr><tr><td>ESP32-S3 N16R8 / generic PSRAM board</td><td>Can simulate as ESP32-S3 if configured</td><td>May need custom board config</td><td>Usually 16 MB flash + 8 MB PSRAM</td><td>Strong recommendation for final hardware if you do not need M5Stack display/camera.</td></tr><tr><td>Raspberry Pi Pico / RP2040</td><td>Yes, Wokwi supports Pi Pico/RP2040</td><td>Yes: raspberrypi/pico boards</td><td>Dual M0+, limited SRAM, no native ESP TensorFlowLite_ESP32 library</td><td>Not recommended for your current ESP32 TensorFlowLite_ESP32 code. Would require porting to TFLM/Pico SDK.</td></tr><tr><td>STM32 boards</td><td>Some STM32 boards supported</td><td>Many PlatformIO STM32 boards</td><td>Varies by exact board</td><td>Possible research comparison only after porting away from TensorFlowLite_ESP32.</td></tr><tr><td>Teensy 4.1</td><td>Not a normal Wokwi target for this flow</td><td>Yes: teensy41</td><td>600 MHz, 512 KB RAM listed by PlatformIO; external memory options exist on real hardware</td><td>Excellent real-hardware benchmark candidate, but not useful for Wokwi demonstration unless you change simulator/toolchain path.</td></tr><tr><td>Raspberry Pi 3B</td><td>Not a microcontroller Wokwi TinyML target</td><td>PlatformIO WiringPi cross-compilation problem observed</td><td>Linux SBC, not MCU</td><td>Do not use for microcontroller benchmark table; use Python/TensorFlow runtime separately if needed.</td></tr></tbody></table>
+
+<h2>Recommended Benchmark Order</h2>
+<table><thead><tr><th>Rank</th><th>Board</th><th>Reason</th></tr></thead><tbody><tr><td>1</td><td>ESP32-S3 with 8 MB PSRAM / M5Stack CoreS3</td><td>Best for professor demo: Wokwi + PlatformIO + PSRAM. Can run all students and the old large model.</td></tr><tr><td>2</td><td>ESP32 DevKit V1</td><td>You already own it. Good proof that compressed students can run without PSRAM. Use it for measured real latency.</td></tr><tr><td>3</td><td>ESP32-S3 no PSRAM</td><td>Good negative-control experiment: shows why PSRAM matters for large tensor arenas.</td></tr><tr><td>4</td><td>Teensy 4.1</td><td>Good future real-board benchmark, but not Wokwi-friendly for your current code.</td></tr><tr><td>5</td><td>RP2040 / STM32</td><td>Only if you have time to port TFLM properly; not recommended before final review.</td></tr></tbody></table>
+
+<h2>What to Report to Professor</h2>
+<ul>
+<li><b>Memory feasibility:</b> show model bytes, tensor arena bytes, free heap/PSRAM, and whether allocation succeeded.</li>
+<li><b>Latency:</b> report Wokwi latency separately from real-board latency. Wokwi is useful for proof and comparison, but it is not a real timing substitute.</li>
+<li><b>Accuracy behavior:</b> Student C was correct for img_9992 because RGB preserved useful cues. Smaller grayscale students were faster but made wrong class predictions.</li>
+<li><b>Hardware conclusion:</b> normal ESP32 can run the compressed students, but ESP32-S3 with PSRAM is safer for future models, camera input, and larger tensor arenas.</li>
+</ul>
+
+<h2>Sources Used</h2>
+<ul>
+<li><a href="https://docs.wokwi.com/getting-started/supported-hardware">Wokwi supported hardware</a>: https://docs.wokwi.com/getting-started/supported-hardware</li><li><a href="https://wokwi.com/projects/new">Wokwi new project board list</a>: https://wokwi.com/projects/new</li><li><a href="https://docs.wokwi.com/vscode/getting-started">Wokwi VS Code + PlatformIO support</a>: https://docs.wokwi.com/vscode/getting-started</li><li><a href="https://docs.platformio.org/en/latest/boards/index.html">PlatformIO board list docs</a>: https://docs.platformio.org/en/latest/boards/index.html</li><li><a href="https://docs.platformio.org/en/latest/boards/espressif32/m5stack-cores3.html">PlatformIO M5Stack CoreS3 board page</a>: https://docs.platformio.org/en/latest/boards/espressif32/m5stack-cores3.html</li><li><a href="https://docs.m5stack.com/en/core/CoreS3">M5Stack CoreS3 official docs</a>: https://docs.m5stack.com/en/core/CoreS3</li><li><a href="https://docs.platformio.org/en/latest/boards/espressif32/esp32-s3-devkitc-1.html">PlatformIO ESP32-S3 DevKitC-1 page</a>: https://docs.platformio.org/en/latest/boards/espressif32/esp32-s3-devkitc-1.html</li><li><a href="https://docs.platformio.org/en/latest/boards/teensy/teensy41.html">PlatformIO Teensy 4.1 page</a>: https://docs.platformio.org/en/latest/boards/teensy/teensy41.html</li>
+<li>Local PlatformIO CLI: <code>pio boards espressif32</code> and <code>pio boards teensy</code>.</li>
+<li>Your Wokwi/ESP32 serial logs collected during this project.</li>
+</ul>
+
+<p class="small">Note: PlatformIO board pages list internal RAM values. Vendor pages may separately list PSRAM for boards such as M5Stack CoreS3.</p>
+</body>
+</html>

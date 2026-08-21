@@ -1,0 +1,264 @@
+<html>
+<head>
+<meta charset="utf-8">
+<title>ESP32-S3 Wokwi Driver Distraction Model Journey</title>
+<style>
+body { font-family: Calibri, Arial, sans-serif; font-size: 11pt; line-height: 1.35; }
+h1 { font-size: 20pt; color: #1f4e79; }
+h2 { font-size: 15pt; color: #2f5597; margin-top: 18pt; }
+pre { background: #f2f2f2; border: 1px solid #d9d9d9; padding: 8pt; font-family: Consolas, monospace; font-size: 9pt; white-space: pre-wrap; }
+code { font-family: Consolas, monospace; }
+table { border-collapse: collapse; width: 100%; margin: 8pt 0; }
+td, th { border: 1px solid #bfbfbf; padding: 5pt; vertical-align: top; }
+th { background: #d9eaf7; }
+</style>
+</head>
+<body>
+
+<h1>ESP32-S3 Wokwi Driver Distraction Model Journey</h1>
+
+<p>This document explains the full debugging journey for running a TensorFlow Lite Micro driver-distraction model on an ESP32-S3 Wokwi simulation. The model is stored in <code>model/model.h</code>, and the test image is stored in <code>images/test_image.h</code>.</p>
+
+<h2>Final Result</h2>
+
+<p>The ESP32-S3 Wokwi simulation successfully loaded the model, allocated the tensor arena in PSRAM, ran inference on the test image, printed the classification in the terminal, and turned on the green LED for distraction.</p>
+
+<pre>Driver distraction inference
+Single image: images/test_image.h
+Class: c5_operating_radio
+Confidence: 0.521174
+Top scores:
+  5 c5_operating_radio 0.5212
+  7 c7_reaching_behind 0.3691
+  4 c4_talking_phone_left 0.0166
+  1 c1_texting_right 0.0154
+  8 c8_hair_and_makeup 0.0148
+Result: DISTRACTION
+LED: green</pre>
+
+<h2>Important Numbers</h2>
+
+<table>
+<tr><th>Item</th><th>Value</th></tr>
+<tr><td>Model size</td><td>179868 bytes</td></tr>
+<tr><td>Input tensor</td><td>1 x 224 x 224 x 3</td></tr>
+<tr><td>Input elements</td><td>150528</td></tr>
+<tr><td>Output tensor</td><td>1 x 10</td></tr>
+<tr><td>First failed tensor arena</td><td>256 KB</td></tr>
+<tr><td>Tensor arena requested by TFLite</td><td>4903680 bytes</td></tr>
+<tr><td>Final tensor arena used</td><td>6291456 bytes</td></tr>
+<tr><td>Free Wokwi PSRAM detected</td><td>8386035 bytes</td></tr>
+</table>
+
+<p>The model file itself was small enough to fit in flash memory. The real memory issue was the tensor arena required by TensorFlow Lite Micro during inference.</p>
+
+<h2>Original Goal</h2>
+
+<p>The goal was to run a driver-distraction classifier on ESP32-S3:</p>
+
+<ul>
+<li>Use <code>model/model.h</code> as the embedded TFLite model.</li>
+<li>Use <code>images/test_image.h</code> as the test image.</li>
+<li>Print the predicted class in the Wokwi terminal.</li>
+<li>Turn on green LED when the result is distraction.</li>
+<li>Turn on red LED when the result is no distraction or model failure.</li>
+</ul>
+
+<h2>Problem 1: Wokwi Had No Terminal Output</h2>
+
+<p>At first, Wokwi showed the red LED but the terminal had no useful output.</p>
+
+<p>The cause was the ESP32-S3 serial mode. ESP32-S3 can use USB CDC serial or UART serial. Wokwi's serial monitor worked better with UART serial in this setup.</p>
+
+<p>The fix was to configure PlatformIO for UART serial:</p>
+
+<pre>build_flags =
+    -D ARDUINO_USB_MODE=0
+    -D ARDUINO_USB_CDC_ON_BOOT=0
+    -O2</pre>
+
+<p>The diagram was also updated with explicit serial monitor wiring:</p>
+
+<pre>[ "esp:TX", "$serialMonitor:RX", "", [] ],
+[ "esp:RX", "$serialMonitor:TX", "", [] ]</pre>
+
+<p>And the serial monitor was forced to show:</p>
+
+<pre>"serialMonitor": {
+  "display": "always",
+  "newline": "lf"
+}</pre>
+
+<h2>Problem 2: PSRAM Was Not Working</h2>
+
+<p>The first ESP32-S3 board configuration used the Freenove ESP32-S3 WROOM profile. That profile expected OPI PSRAM. Wokwi failed to initialize it.</p>
+
+<pre>E opi psram: PSRAM ID read error: 0x00000000
+E spiram: SPI RAM enabled but initialization failed
+Free PSRAM: 0</pre>
+
+<p>The fix was to switch the PlatformIO board to a PSRAM DevKitC-style profile:</p>
+
+<pre>board = rymcu-esp32-s3-devkitc-1</pre>
+
+<p>The Wokwi board also uses:</p>
+
+<pre>{ "type": "board-esp32-s3-devkitc-1", "attrs": { "psramSize": "8" } }</pre>
+
+<p>After this fix, Wokwi printed:</p>
+
+<pre>Free PSRAM: 8386035</pre>
+
+<h2>Problem 3: psramFound() Was Misleading</h2>
+
+<p>At one point the program printed that PSRAM was detected, but <code>Free PSRAM</code> was still zero. Because of that, the code was changed to trust:</p>
+
+<pre>ESP.getFreePsram()</pre>
+
+<p>instead of relying only on:</p>
+
+<pre>psramFound()</pre>
+
+<h2>Problem 4: TensorFlow Lite Micro Crashed With abort()</h2>
+
+<p>After PSRAM started working, the firmware crashed with:</p>
+
+<pre>abort() was called</pre>
+
+<p>The decoded backtrace showed the crash inside TensorFlow Lite Micro allocator setup:</p>
+
+<pre>tflite::SimpleMemoryAllocator::Create(...)
+tflite::MicroAllocator::Create(...)
+tflite::MicroInterpreter::MicroInterpreter(...)</pre>
+
+<p>The problem was that <code>MicroInterpreter</code> was created with a null error reporter.</p>
+
+<p>The fix was to include:</p>
+
+<pre>#include "tensorflow/lite/micro/micro_error_reporter.h"</pre>
+
+<p>and create:</p>
+
+<pre>static tflite::MicroErrorReporter errorReporter;</pre>
+
+<p>Then pass it into the interpreter:</p>
+
+<pre>static tflite::MicroInterpreter interpreter(
+    model, resolver, tensorArena, kTensorArenaSize, &errorReporter, nullptr, nullptr);</pre>
+
+<h2>Problem 5: Tensor Arena Was Too Small</h2>
+
+<p>The first safer test used a small internal RAM tensor arena:</p>
+
+<pre>constexpr size_t kTensorArenaSize = 256 * 1024;</pre>
+
+<p>This did not crash, but TensorFlow Lite Micro reported the real memory requirement:</p>
+
+<pre>Failed to resize buffer. Requested: 4903680, available 254592, missing: 4649088
+AllocateTensors failed. Increase tensor arena if RAM allows.</pre>
+
+<p>This showed that the model needed about 4903680 bytes of tensor arena memory.</p>
+
+<p>The final tensor arena was increased to 6 MB:</p>
+
+<pre>constexpr size_t kTensorArenaSize = 6 * 1024 * 1024;</pre>
+
+<p>The final tensor arena size was 6291456 bytes.</p>
+
+<h2>Final Memory Allocation Fix</h2>
+
+<p>The tensor arena is allocated from PSRAM using ESP-IDF heap capabilities:</p>
+
+<pre>tensorArena = static_cast&lt;uint8_t *&gt;(
+    heap_caps_malloc(kTensorArenaSize, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT));</pre>
+
+<p>This is similar to <code>ps_malloc()</code>, but more explicit. It requests external SPIRAM with 8-bit access.</p>
+
+<p>After this fix, Wokwi printed:</p>
+
+<pre>Allocating tensor arena in PSRAM.
+Tensor arena address: 0x3D800A0C
+Tensor arena bytes: 6291456
+Input shape: 1 224 224 3 type=1
+Output shape: 1 10 type=1
+Test image elements: 150528</pre>
+
+<h2>Final PlatformIO Configuration</h2>
+
+<pre>[env:esp32-s3-devkitc-1]
+platform = espressif32
+board = rymcu-esp32-s3-devkitc-1
+framework = arduino
+monitor_speed = 115200
+board_build.partitions = default_16MB.csv
+build_flags =
+    -D ARDUINO_USB_MODE=0
+    -D ARDUINO_USB_CDC_ON_BOOT=0
+    -O2
+lib_deps =
+    tanakamasayuki/TensorFlowLite_ESP32@^1.0.0</pre>
+
+<h2>Final Wokwi Configuration</h2>
+
+<p>The Wokwi board is ESP32-S3 with 8 MB PSRAM:</p>
+
+<pre>{ "type": "board-esp32-s3-devkitc-1", "id": "esp", "attrs": { "psramSize": "8" } }</pre>
+
+<p>LED wiring:</p>
+
+<pre>GPIO 12 -> green LED
+GPIO 13 -> red LED</pre>
+
+<p>Serial monitor wiring:</p>
+
+<pre>[ "esp:TX", "$serialMonitor:RX", "", [] ],
+[ "esp:RX", "$serialMonitor:TX", "", [] ]</pre>
+
+<h2>Delay Measurement</h2>
+
+<p>The code measures inference time around:</p>
+
+<pre>interpreter.Invoke()</pre>
+
+<p>It prints:</p>
+
+<pre>sim-delay: XXXX ms
+Actual-delay: about YYYY.Y ms estimated for real ESP32-S3 hardware</pre>
+
+<p><code>sim-delay</code> is measured directly in Wokwi. <code>Actual-delay</code> is only an estimate using:</p>
+
+<pre>constexpr float kEstimatedWokwiToHardwareSpeedRatio = 20.0f;</pre>
+
+<p>So:</p>
+
+<pre>Actual-delay = sim-delay / 20</pre>
+
+<p>This is approximate because Wokwi simulation speed is not the same as a physical ESP32-S3 board.</p>
+
+<h2>Final Conclusion</h2>
+
+<p>The model was not failing because of flash size. The model was only 179868 bytes. The important memory requirement was the TensorFlow Lite Micro tensor arena.</p>
+
+<pre>4903680 bytes requested
+6291456 bytes allocated</pre>
+
+<p>The final working solution was:</p>
+
+<ul>
+<li>Use ESP32-S3 with PSRAM in Wokwi.</li>
+<li>Use UART serial instead of USB CDC for visible terminal output.</li>
+<li>Use the RYMCU ESP32-S3 PSRAM board profile.</li>
+<li>Use a valid TFLite Micro error reporter.</li>
+<li>Allocate a 6 MB tensor arena in PSRAM.</li>
+<li>Run inference on <code>images/test_image.h</code>.</li>
+<li>Print class result and LED state.</li>
+</ul>
+
+<p>The final result was:</p>
+
+<pre>Class: c5_operating_radio
+Result: DISTRACTION
+LED: green</pre>
+
+</body>
+</html>
