@@ -1,0 +1,5 @@
+model,accuracy,precision,recall,f1-score,report_file
+ConvNeXt,0.4490281634272114,0.5631186974706928,0.4501408463168924,0.434811802226634,C:\Users\HP\Downloads\state-farm-distracted-driver-detection\distilled_from_convnext_outputs\classification_report.csv
+EfficientNet,0.5228084093613645,0.5143938317001181,0.5182347133654877,0.5030303195456161,C:\Users\HP\Downloads\state-farm-distracted-driver-detection\distilled_from_efficientnet_b0_outputs\classification_report.csv
+ResNet50,0.5928203094010314,0.6091730946090606,0.5905439390843804,0.5870839676847276,C:\Users\HP\Downloads\state-farm-distracted-driver-detection\distilled_from_resnet50_outputs\classification_report.csv
+MobileNet,0.5491868306227687,0.5522146204207665,0.5465637869021545,0.5437617417336192,C:\Users\HP\Downloads\state-farm-distracted-driver-detection\distilled_from_mobilenet_v3_small_outputs\classification_report.csv

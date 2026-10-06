@@ -1,0 +1,5 @@
+model,model_file,samples,accuracy,precision_macro,recall_macro,f1_macro
+Teacher-EfficientNet 224x224x3,C:\Users\HP\Downloads\state-farm-distracted-driver-detection\distracted_driver_teacher_outputs\best_teacher_model_sanitized.keras,4485,0.8729096989966555,0.8766225967431186,0.8723491062710946,0.8704583835627948
+Student Compact grayscale CNN 96x96x1,C:\Users\HP\Downloads\state-farm-distracted-driver-detection\distilled_student_96_outputs\best_distilled_student_96_gray.keras,4485,0.716164994425864,0.7241154587485134,0.7104365241810456,0.6963802681862581
+Student Wider grayscale CNN 96x96x1,C:\Users\HP\Downloads\state-farm-distracted-driver-detection\distilled_student_96_bigger_outputs\best_distilled_student_96_gray_bigger.keras,4485,0.8887402452619844,0.8920006370886574,0.8877768299565213,0.8872633016993466
+Student Wider RGB CNN 96x96x3,C:\Users\HP\Downloads\state-farm-distracted-driver-detection\distilled_student_96_rgb_outputs\best_distilled_student_96_rgb.keras,4485,0.9449275362318841,0.9466166571004484,0.9428741033875505,0.9438288922497999

@@ -1,0 +1,5 @@
+model,matrix_file,classes,samples,correct,accuracy
+ConvNeXt,C:\Users\HP\Downloads\state-farm-distracted-driver-detection\distilled_from_convnext_outputs\confusion_matrix.csv,10,5042,2264,0.4490281634272114
+EfficientNet,C:\Users\HP\Downloads\state-farm-distracted-driver-detection\distilled_from_efficientnet_b0_outputs\confusion_matrix.csv,10,5042,2636,0.5228084093613645
+ResNet50,C:\Users\HP\Downloads\state-farm-distracted-driver-detection\distilled_from_resnet50_outputs\confusion_matrix.csv,10,5042,2989,0.5928203094010314
+MobileNet,C:\Users\HP\Downloads\state-farm-distracted-driver-detection\distilled_from_mobilenet_v3_small_outputs\confusion_matrix.csv,10,5042,2769,0.5491868306227687

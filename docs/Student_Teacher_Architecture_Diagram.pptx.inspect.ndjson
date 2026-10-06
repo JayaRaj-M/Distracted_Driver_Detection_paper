@@ -1,0 +1,65 @@
+{"kind":"deck","id":"pr/iho5vu","name":"Deck"}
+{"kind":"layout","layoutId":"7b1932ad-9632-40fb-926c-becdd6ba1782","name":"Master","type":"master"}
+{"kind":"layout","layoutId":"cdd9faeb-79ed-4d3c-8bcb-16d298234d6a","name":"Title Slide","type":"title"}
+{"kind":"slide","id":"sl/b8zxsw","slide":1,"title":"Teacher-Student TinyML Architecture for Driver Distraction Detection","textShapes":32}
+{"kind":"textbox","id":"sh/wjmpcfil","slide":1,"text":"Teacher-Student TinyML Architecture for Driver Distraction Detection","textPreview":"Teacher-Student TinyML Architecture for Driver Distraction Detection","textChars":68,"textLines":1,"bbox":[52,20,1176,46]}
+{"kind":"shape","id":"sh/vid83ah0","slide":1,"bbox":[105,92,220,150]}
+{"kind":"textbox","id":"sh/ah47a50f","slide":1,"text":"Stage 1","textPreview":"Stage 1","textChars":7,"textLines":1,"bbox":[113,104,204,24]}
+{"kind":"textbox","id":"sh/9gvq10zu","slide":1,"text":"Input\n96 x 96 RGB","textPreview":"Input | 96 x 96 RGB","textChars":17,"textLines":2,"bbox":[125,146,70,74]}
+{"kind":"textbox","id":"sh/8f2p8vi9","slide":1,"text":"Conv Stem\n3 x 3 + ReLU","textPreview":"Conv Stem | 3 x 3 + ReLU","textChars":22,"textLines":2,"bbox":[217,146,86,74]}
+{"kind":"shape","id":"sh/net8zqh4","slide":1,"bbox":[345,92,220,150]}
+{"kind":"textbox","id":"sh/mdk7650j","slide":1,"text":"Stage 2","textPreview":"Stage 2","textChars":7,"textLines":1,"bbox":[353,104,204,24]}
+{"kind":"textbox","id":"sh/tcfqd4ze","slide":1,"text":"Pool","textPreview":"Pool","textChars":4,"textLines":1,"bbox":[365,146,58,74]}
+{"kind":"textbox","id":"sh/sb6p4zit","slide":1,"text":"Depthwise\nSeparable\nBlock","textPreview":"Depthwise | Separable | Block","textChars":25,"textLines":3,"bbox":[443,140,100,86]}
+{"kind":"shape","id":"sh/etwv2p4f","slide":1,"bbox":[585,92,220,150]}
+{"kind":"textbox","id":"sh/fu5cvu50","slide":1,"text":"Stage 3","textPreview":"Stage 3","textChars":7,"textLines":1,"bbox":[593,104,204,24]}
+{"kind":"textbox","id":"sh/gved4zml","slide":1,"text":"Pool","textPreview":"Pool","textChars":4,"textLines":1,"bbox":[605,146,58,74]}
+{"kind":"textbox","id":"sh/1wnux4n6","slide":1,"text":"Repeated\nSeparable\nBlocks","textPreview":"Repeated | Separable | Blocks","textChars":25,"textLines":3,"bbox":[683,140,100,86]}
+{"kind":"shape","id":"sh/6pwvyp4j","slide":1,"bbox":[825,92,250,150]}
+{"kind":"textbox","id":"sh/rq5cru5o","slide":1,"text":"Stage 4","textPreview":"Stage 4","textChars":7,"textLines":1,"bbox":[833,104,234,24]}
+{"kind":"textbox","id":"sh/sred0zm9","slide":1,"text":"Final\nSeparable\nBlock","textPreview":"Final | Separable | Block","textChars":21,"textLines":3,"bbox":[845,140,105,86]}
+{"kind":"textbox","id":"sh/tsnut4nu","slide":1,"text":"GAP +\nDense(10)","textPreview":"GAP + | Dense(10)","textChars":15,"textLines":2,"bbox":[973,134,78,96]}
+{"kind":"textbox","id":"sh/qlgvat4n","slide":1,"text":"Output\n10 classes","textPreview":"Output | 10 classes","textChars":17,"textLines":2,"bbox":[1098,143,92,52]}
+{"kind":"shape","id":"sh/bmpc3e58","slide":1,"bbox":[195,183,22,0]}
+{"kind":"shape","id":"sh/761sv6lk","slide":1,"bbox":[303,183,62,0]}
+{"kind":"shape","id":"sh/m58r2lkz","slide":1,"bbox":[423,183,20,0]}
+{"kind":"shape","id":"sh/98jaxg3q","slide":1,"bbox":[543,183,62,0]}
+{"kind":"shape","id":"sh/87a94b25","slide":1,"bbox":[663,183,20,0]}
+{"kind":"shape","id":"sh/vu1szqlg","slide":1,"bbox":[783,183,62,0]}
+{"kind":"shape","id":"sh/utsr6lkb","slide":1,"bbox":[950,182,23,1]}
+{"kind":"shape","id":"sh/hwja103m","slide":1,"bbox":[1051,169,47,13]}
+{"kind":"textbox","id":"sh/wva98v21","slide":1,"text":"(a) Embedded student inference pipeline","textPreview":"(a) Embedded student inference pipeline","textChars":39,"textLines":1,"bbox":[70,254,360,24]}
+{"kind":"shape","id":"sh/jyls3qls","slide":1,"bbox":[88,298,330,340]}
+{"kind":"textbox","id":"sh/ixcra5k7","slide":1,"text":"(b) Depthwise separable block","textPreview":"(b) Depthwise separable block","textChars":29,"textLines":1,"bbox":[112,312,280,24]}
+{"kind":"textbox","id":"sh/g3u90fil","slide":1,"text":"1 x 1 Pointwise Conv\nBN / ReLU","textPreview":"1 x 1 Pointwise Conv | BN / ReLU","textChars":30,"textLines":2,"bbox":[142,354,220,54]}
+{"kind":"textbox","id":"sh/14nqt0zq","slide":1,"text":"3 x 3 Depthwise Conv\nBN / ReLU","textPreview":"3 x 3 Depthwise Conv | BN / ReLU","textChars":30,"textLines":2,"bbox":[142,438,220,54]}
+{"kind":"textbox","id":"sh/e1cry50f","slide":1,"text":"MaxPool\nactivation memory reduced","textPreview":"MaxPool | activation memory reduced","textChars":33,"textLines":2,"bbox":[142,522,220,54]}
+{"kind":"textbox","id":"sh/f2l8rah0","slide":1,"text":"+","textPreview":"+","textChars":1,"textLines":1,"bbox":[245,594,44,36]}
+{"kind":"shape","id":"sh/szu9wvi9","slide":1,"bbox":[252,408,0,30]}
+{"kind":"shape","id":"sh/t03qp0ju","slide":1,"bbox":[252,492,0,30]}
+{"kind":"shape","id":"sh/6xcrul03","slide":1,"bbox":[252,576,15,18]}
+{"kind":"shape","id":"sh/ryl8nq1o","slide":1,"bbox":[478,298,330,340]}
+{"kind":"textbox","id":"sh/4va9sbid","slide":1,"text":"(c) Transfer learning + distillation","textPreview":"(c) Transfer learning + distillation","textChars":36,"textLines":1,"bbox":[506,312,280,24]}
+{"kind":"textbox","id":"sh/5wjqlgjy","slide":1,"text":"Teacher CNN\n224 x 224 RGB","textPreview":"Teacher CNN | 224 x 224 RGB","textChars":25,"textLines":2,"bbox":[534,354,218,52]}
+{"kind":"textbox","id":"sh/9gz6tczq","slide":1,"text":"Soft probabilities\nT = 4.0","textPreview":"Soft probabilities | T = 4.0","textChars":26,"textLines":2,"bbox":[534,430,218,48]}
+{"kind":"textbox","id":"sh/8fq5kry5","slide":1,"text":"Hard labels\nCE loss","textPreview":"Hard labels | CE loss","textChars":19,"textLines":2,"bbox":[512,524,118,48]}
+{"kind":"textbox","id":"sh/7ehormhk","slide":1,"text":"KL loss\nalpha = 0.45","textPreview":"KL loss | alpha = 0.45","textChars":20,"textLines":2,"bbox":[656,524,118,48]}
+{"kind":"textbox","id":"sh/mdonihgz","slide":1,"text":"Student update","textPreview":"Student update","textChars":14,"textLines":1,"bbox":[558,600,170,38]}
+{"kind":"shape","id":"sh/h4z6xwfm","slide":1,"bbox":[643,406,0,24]}
+{"kind":"shape","id":"sh/w3q5ory1","slide":1,"bbox":[643,478,72,46]}
+{"kind":"shape","id":"sh/v2hovmhg","slide":1,"bbox":[571,572,72,28]}
+{"kind":"shape","id":"sh/u18nmhgv","slide":1,"bbox":[643,572,72,28]}
+{"kind":"shape","id":"sh/x8f6lszi","slide":1,"bbox":[868,298,330,340]}
+{"kind":"textbox","id":"sh/c765c7yx","slide":1,"text":"(d) Hardware deployment path","textPreview":"(d) Hardware deployment path","textChars":28,"textLines":1,"bbox":[898,312,270,24]}
+{"kind":"textbox","id":"sh/2dk3mtwf","slide":1,"text":"INT8 TFLite\n22.7 KB","textPreview":"INT8 TFLite | 22.7 KB","textChars":19,"textLines":2,"bbox":[920,354,120,54]}
+{"kind":"textbox","id":"sh/3etkvyx0","slide":1,"text":"Tensor arena\n204.8 KB","textPreview":"Tensor arena | 204.8 KB","textChars":21,"textLines":2,"bbox":[1028,442,132,54]}
+{"kind":"textbox","id":"sh/ofmlo3el","slide":1,"text":"Image header\n96 x 96 x 3","textPreview":"Image header | 96 x 96 x 3","textChars":24,"textLines":2,"bbox":[920,522,128,54]}
+{"kind":"textbox","id":"sh/pgv2x8f6","slide":1,"text":"Class decision\nsafe / distraction","textPreview":"Class decision | safe / distraction","textChars":33,"textLines":2,"bbox":[1038,600,132,44]}
+{"kind":"shape","id":"sh/qh43qdwr","slide":1,"bbox":[1028,381,12,88]}
+{"kind":"shape","id":"sh/bidkzixc","slide":1,"bbox":[1094,496,10,104]}
+{"kind":"shape","id":"sh/cjmlsnex","slide":1,"bbox":[1038,549,10,73]}
+{"kind":"shape","id":"sh/xkvm1sfi","slide":1,"bbox":[253,242,202,56]}
+{"kind":"shape","id":"sh/6l03e9wn","slide":1,"bbox":[215,242,428,56]}
+{"kind":"shape","id":"sh/rm9knexs","slide":1,"bbox":[950,242,83,56]}
+{"kind":"textbox","id":"sh/ve58zq9o","slide":1,"text":"Shared student profile: 17 Keras layers, 10 learnable layers, 0.00553M parameters, 7.81M FLOPs","textPreview":"Shared student profile: 17 Keras layers, 10 learnable layers, 0.00553M parameters, 7.81M FLOPs","textChars":94,"textLines":1,"bbox":[74,666,1132,28]}
+{"kind":"notes","id":"nt/b8zxsw","slide":1,"text":""}

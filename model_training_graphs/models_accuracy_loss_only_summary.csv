@@ -1,0 +1,5 @@
+model,history_file,epochs,best_epoch,best_val_accuracy,best_val_loss,final_train_accuracy,final_val_accuracy,final_train_loss,final_val_loss
+ConvNeXt,C:\Users\HP\Downloads\state-farm-distracted-driver-detection\distilled_from_convnext_outputs\student_training_history.csv,25,16,0.4490281641483307,1.5863304138183594,0.7510643005371094,0.4446648061275482,0.7083494067192078,1.6035629510879517
+EfficientNet-B0,C:\Users\HP\Downloads\state-farm-distracted-driver-detection\distilled_from_efficientnet_b0_outputs\student_training_history.csv,26,17,0.5228084325790405,1.3712377548217771,0.809745728969574,0.5136850476264954,1.6149026155471802,1.403010606765747
+ResNet50,C:\Users\HP\Downloads\state-farm-distracted-driver-detection\distilled_from_resnet50_outputs\student_training_history.csv,20,11,0.5928202867507935,1.1390652656555176,0.8541019558906555,0.5739786028862,1.6729717254638672,1.2610676288604736
+MobileNetV3-Small,C:\Users\HP\Downloads\state-farm-distracted-driver-detection\distilled_from_mobilenet_v3_small_outputs\student_training_history.csv,31,22,0.5491868257522583,1.310727834701538,0.860085129737854,0.5464101433753967,1.2551252841949463,1.3186439275741575
